@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Imagem NGINX Docker personalizada por Daniel Alves de Araújo, Desenvolvedor FullStack.">
+  <title>NGINX • Daniel Alves</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --panel: rgba(17, 27, 45, .82);
+      --line: rgba(148, 163, 184, .17);
+      --text: #e8eef8;
+      --muted: #93a4bb;
+      --accent: #54d6ff;
+      --green: #70e1b5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(28, 117, 180, .22), transparent 38%),
+        radial-gradient(ellipse at 90% 82%, rgba(25, 178, 137, .12), transparent 35%),
+        var(--bg);
+      display: grid; place-items: center; padding: 28px 16px;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .16;
+      background-image: linear-gradient(rgba(148,163,184,.13) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(148,163,184,.13) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+    .shell { width: min(100%, 980px); position: relative; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: #c9d8eb; font-size: .9rem; letter-spacing: .08em; text-transform: uppercase; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(84,214,255,.35); border-radius: 10px; color: var(--accent); background: rgba(84,214,255,.08); font-weight: 800; }
+    .status { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-size: .78rem; border: 1px solid rgba(112,225,181,.2); background: rgba(112,225,181,.07); padding: 6px 10px; border-radius: 999px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
+    .card { border: 1px solid var(--line); border-radius: 24px; overflow: hidden; background: var(--panel); box-shadow: 0 28px 80px rgba(0,0,0,.32); backdrop-filter: blur(16px); }
+    .hero { padding: clamp(26px, 5vw, 54px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(230px, .75fr); gap: 36px; align-items: center; }
+    .eyebrow { color: var(--accent); font: 600 .76rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 12px 0 4px; font-size: clamp(2.1rem, 5.5vw, 4.2rem); line-height: 1.05; letter-spacing: -.055em; }
+    .role { margin: 0; color: #b9c9dd; font-size: clamp(1rem, 2vw, 1.2rem); }
+    .intro { color: var(--muted); max-width: 560px; margin: 22px 0 26px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 17px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: .92rem; transition: transform .2s, border-color .2s, background .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--green); color: #062218; border: 1px solid transparent; }
+    .btn-secondary { color: var(--text); border: 1px solid rgba(148,163,184,.24); background: rgba(148,163,184,.06); }
+    .qr-panel { text-align: center; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: rgba(5,12,23,.42); }
+    .qr-panel img { width: 176px; max-width: 100%; height: auto; display: block; margin: 0 auto 14px; border-radius: 10px; }
+    .qr-panel strong { display: block; font-size: .94rem; }
+    .qr-panel p { color: var(--muted); font-size: .8rem; margin: 5px 0 0; }
+    .tech { border-top: 1px solid var(--line); padding: 22px clamp(26px, 5vw, 54px) 26px; }
+    .tech-title { margin: 0 0 14px; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .12em; }
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+    .chip { color: #c5d4e8; border: 1px solid rgba(148,163,184,.17); background: rgba(148,163,184,.055); border-radius: 8px; padding: 6px 10px; font: .78rem ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 18px 4px 0; color: #70839c; font-size: .78rem; }
+    .footer a { color: #9db4cf; text-decoration: none; }
+    .footer a:hover { color: var(--accent); }
+    @media (max-width: 700px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; }
+      .qr-panel { width: min(100%, 320px); margin: 0 auto; }
+      .topline { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topline">
+      <div class="brand"><span class="brand-mark">N</span><span>NGINX · Docker Image</span></div>
+      <span class="status"><span class="dot"></span> container ready</span>
+    </header>
+
+    <section class="card">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">Hello, developer_</div>
+          <h1>Daniel Alves<br>de Araújo</h1>
+          <p class="role">Desenvolvedor FullStack</p>
+          <p class="intro">Tecnologia, código e infraestrutura trabalhando juntos para transformar ideias em soluções web. Esta imagem NGINX foi preparada para compartilhar um ambiente simples, útil e pronto para personalização.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="https://wa.me/5588988183286?text=Ol%C3%A1%20Daniel%2C%20%20baixei%20sua%20imagem%20do%20Nginx%20pelo%20DockerHub%2C%20obrigado%20por%20disponibilizar" target="_blank" rel="noopener noreferrer">↗ Falar comigo no WhatsApp</a>
+            <a class="btn btn-secondary" href="https://www.instagram.com/dannielfisico/" target="_blank" rel="noopener noreferrer">◎ Instagram @dannielfisico</a>
+          </div>
+        </div>
+        <aside class="qr-panel">
+          <img src="data:image/png;base64,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" alt="QR Code para iniciar conversa no WhatsApp com Daniel">
+          <strong>Vamos conversar?</strong>
+          <p>Escaneie para abrir o WhatsApp<br>com uma mensagem pronta.</p>
+        </aside>
+      </div>
+
+      <div class="tech">
+        <p class="tech-title">Stack &amp; ferramentas</p>
+        <div class="chips">
+          <span class="chip">Docker</span><span class="chip">NGINX</span><span class="chip">Kubernetes</span>
+          <span class="chip">Node.js</span><span class="chip">Express</span><span class="chip">Handlebars</span>
+          <span class="chip">EJS</span><span class="chip">HTML5</span><span class="chip">CSS3</span>
+          <span class="chip">JavaScript</span><span class="chip">MongoDB</span><span class="chip">SQL</span>
+          <span class="chip">Linux</span><span class="chip">Backend</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Feito com código, curiosidade e café ☕</span>
+      <span>© Daniel Alves de Araújo · NGINX Docker image</span>
+    </footer>
+  </main>
+</body>
+</html>
